@@ -11,7 +11,9 @@ import java.util.concurrent.Executors;
 
 import com.spring.app.models.ChucVu;
 import com.spring.app.models.PhongBan;
+import com.spring.app.services.NhanVienService;
 import com.spring.app.services.PhongBanService;
+import com.spring.app.services.impl.PhongBanServiceImpl;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.spring.app.ensure.EnsureParam;
 import com.spring.app.models.FileUploadResponse;
 import com.spring.app.models.NhanVien;
-import com.spring.app.services.NhanVienServices;
+import com.spring.app.services.impl.NhanVienServicesImpl;
 import com.spring.app.utils.FileUploadUtil;
 import com.spring.app.utils.HttpStatusUtils;
 import com.spring.app.utils.JsonUtils;
@@ -42,7 +44,7 @@ import com.spring.app.utils.StringUtils;
 public class NhanVienRest {
 
 	@Autowired
-	private NhanVienServices nhanVienServices;
+	private NhanVienService nhanVienService;
 
 	@Autowired
 	private PhongBanService phongBanService;
@@ -77,7 +79,7 @@ public class NhanVienRest {
 		filter.put("phong", phong);
 		filter.put("trangthai", trangthai);
 
-		List<Document> list = this.nhanVienServices.findAll(filter);
+		List<Document> list = this.nhanVienService.findAll(filter);
 		if (list == null) {
 			return this.responseUtils.Error(HttpStatusUtils.NO_CONTENT.getMessage(),
 					HttpStatusUtils.NO_CONTENT.getCode());
@@ -91,7 +93,7 @@ public class NhanVienRest {
 			return this.responseUtils.Error("Thiếu id nhân viên!", HttpStatusUtils.NO_PARAM.getCode());
 		}
 
-		Document nhanVien = this.nhanVienServices.findOne(id);
+		Document nhanVien = this.nhanVienService.findOne(id);
 		if (nhanVien == null || nhanVien.isEmpty()) {
 			return this.responseUtils.Error(HttpStatusUtils.NO_CONTENT.getMessage(),
 					HttpStatusUtils.NO_CONTENT.getCode());
@@ -132,11 +134,11 @@ public class NhanVienRest {
 		ExecutorService executor = Executors.newFixedThreadPool(3);
 
 		CompletableFuture<Boolean> checkMail = CompletableFuture.supplyAsync(() -> {
-			return this.nhanVienServices.checkMailExists(req.getEmail(), null);
+			return this.nhanVienService.checkMailExists(req.getEmail(), null);
 		}, executor);
 
 		CompletableFuture<Boolean> checkPhone = CompletableFuture.supplyAsync(() -> {
-			return this.nhanVienServices.checkPhoneExists(req.getSdt(), null);
+			return this.nhanVienService.checkPhoneExists(req.getSdt(), null);
 		}, executor);
 
 		List<CompletableFuture<Boolean>> listFt = Arrays.asList(checkMail, checkPhone);
@@ -162,7 +164,7 @@ public class NhanVienRest {
 				nhanVien.put("createdAt", new Date());
 				nhanVien.put("_id", id);
 
-				boolean rs = this.nhanVienServices.create(nhanVien);
+				boolean rs = this.nhanVienService.create(nhanVien);
 				if (rs) {
 					req.setId(id.toHexString());
 					return this.responseUtils.Success(req);
@@ -202,7 +204,7 @@ public class NhanVienRest {
 		}
 
 		if (req.getSdt() != null) {
-			boolean isPhoneExists = this.nhanVienServices.checkPhoneExists(req.getSdt(), req.getId());
+			boolean isPhoneExists = this.nhanVienService.checkPhoneExists(req.getSdt(), req.getId());
 			if (isPhoneExists) {
 				return this.responseUtils.Error(HttpStatusUtils.PHONE_EXISTS.getMessage(),
 						HttpStatusUtils.PHONE_EXISTS.getCode());
@@ -216,7 +218,7 @@ public class NhanVienRest {
 						HttpStatusUtils.INVALID_EMAIL.getCode());
 			}
 
-			boolean isEmailExists = this.nhanVienServices.checkMailExists(req.getEmail(), req.getId());
+			boolean isEmailExists = this.nhanVienService.checkMailExists(req.getEmail(), req.getId());
 			if (isEmailExists) {
 				return this.responseUtils.Error(HttpStatusUtils.EMAIL_EXISTS.getMessage(),
 						HttpStatusUtils.EMAIL_EXISTS.getCode());
@@ -240,7 +242,7 @@ public class NhanVienRest {
 			nhanvien.put("phongBanId", req.getPhongBanId());
 		}
 
-		boolean rs = this.nhanVienServices.update(nhanvien, req.getId());
+		boolean rs = this.nhanVienService.update(nhanvien, req.getId());
 		if (rs) {
 			return this.responseUtils.Success(req);
 		}
@@ -260,7 +262,7 @@ public class NhanVienRest {
 			return this.responseUtils.Error("Thiếu id nhân viên!", HttpStatusUtils.NO_PARAM.getCode());
 		}
 
-		boolean rs = this.nhanVienServices.delete(req.getId());
+		boolean rs = this.nhanVienService.delete(req.getId());
 		if (rs) {
 			return this.responseUtils.Success(req);
 		}

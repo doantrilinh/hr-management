@@ -1,8 +1,9 @@
-package com.spring.app.services;
+package com.spring.app.services.impl;
 
 import java.util.List;
 import java.util.Map;
 
+import com.spring.app.services.NhanVienService;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 import com.spring.app.dao.NhanVienDao;
 
 @Service
-public class NhanVienServices {
+public class NhanVienServicesImpl implements NhanVienService {
 
 	@Autowired
 	private NhanVienDao nhanVienDao;

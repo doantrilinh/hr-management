@@ -3,7 +3,7 @@ package com.spring.app.schedule;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.spring.app.services.NhanVienServices;
+import com.spring.app.services.impl.NhanVienServicesImpl;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import org.bson.Document;
@@ -21,12 +21,12 @@ import java.util.List;
 public class TinhLuongSchedule {
 
 	@Autowired
-	private NhanVienServices nhanVienServices;
+	private NhanVienServicesImpl nhanVienServicesImpl;
 
 	@Scheduled(cron = "0 * * * * ?")
 	public void salary() {
 
-		List<Document> documents = nhanVienServices.findAll();
+		List<Document> documents = nhanVienServicesImpl.findAll();
 		File excelFile = new File("Files-Upload/ipIqOl11-BangLuongThang_10_2023.xlsx");
 		try (Workbook workbook = excelFile.exists() ? WorkbookFactory.create(excelFile) : new XSSFWorkbook()) {
 			Sheet sheet = workbook.getSheet("NhanVien");
