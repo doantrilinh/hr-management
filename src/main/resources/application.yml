@@ -1,0 +1,8 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: hr-management-service
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/hr-management
